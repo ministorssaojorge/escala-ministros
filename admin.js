@@ -147,7 +147,7 @@ async function carregarEscalas() {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td>${e.data}</td>
+      <td>${formatarDataBR(e.data)}
       <td>${e.missa}</td>
       <td>${e.ministros.join(", ")}</td>
       <td>
@@ -213,3 +213,8 @@ missa.addEventListener("blur", () => {
 
 carregarMinistros();
 carregarEscalas();
+
+function formatarDataBR(dataISO) {
+  const partes = dataISO.split("-");
+  return partes[2] + "/" + partes[1] + "/" + partes[0];
+}
