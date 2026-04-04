@@ -8,93 +8,105 @@ import {
   collection, addDoc, getDocs, doc, updateDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-let editandoId = null;
 let editandoMinistroId = null;
+let editandoId = null;
 let escalasCache = {};
+
+const ministrosRef = collection(db, "ministros");
+const escalasRef = collection(db, "escalas");
 
 window.login = async function () {
   await signInWithEmailAndPassword(auth, email.value, senha.value);
-
   alert("Logado!");
   carregarMinistros();
   carregarEscalas();
 };
 
-const ministrosRef = collection(db, "ministros");
-const escalasRef = collection(db, "escalas");
-
+// =========================
+// MINISTROS
+// =========================
 window.addMinistro = async function () {
   if (!ministro.value) return;
 
+  const dados = {
+    nome: ministro.value,
+    telefone: telefone.value
+  };
+
   if (editandoMinistroId) {
-    await updateDoc(doc(db, "ministros", editandoMinistroId), {
-      nome: ministro.value
-    });
-    alert("Ministro atualizado!");
+    await updateDoc(doc(db, "ministros", editandoMinistroId), dados);
     editandoMinistroId = null;
+    alert("Atualizado!");
   } else {
-    await addDoc(ministrosRef, { nome: ministro.value });
-    alert("Ministro criado!");
+    await addDoc(ministrosRef, dados);
+    alert("Criado!");
   }
 
   ministro.value = "";
+  telefone.value = "";
+
   carregarMinistros();
 };
 
 async function carregarMinistros() {
   const lista = document.getElementById("listaMinistros");
+  const checkboxDiv = document.getElementById("checkboxMinistros");
+
   lista.innerHTML = "";
+  checkboxDiv.innerHTML = "";
 
   const snapshot = await getDocs(ministrosRef);
 
   snapshot.forEach(docSnap => {
-    const nome = docSnap.data().nome;
+    const m = docSnap.data();
 
-    const div = document.createElement("div");
-
-    div.innerHTML = `
-      <label>
-        <input type="checkbox" value="${nome}">
-        ${nome}
-      </label>
+    // tabela
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${m.nome}</td>
+      <td>${m.telefone || "-"}</td>
+      <td>
+        <button class="acao-btn edit" onclick="editarMinistro('${docSnap.id}', '${m.nome}', '${m.telefone}')">✏️</button>
+        <button class="acao-btn delete" onclick="excluirMinistro('${docSnap.id}')">🗑️</button>
+      </td>
     `;
+    lista.appendChild(tr);
 
-    const btnEditar = document.createElement("button");
-    btnEditar.innerText = "✏️";
-    btnEditar.onclick = () => editarMinistro(docSnap.id, nome);
-
-    const btnExcluir = document.createElement("button");
-    btnExcluir.innerText = "🗑️";
-    btnExcluir.onclick = () => excluirMinistro(docSnap.id);
-
-    div.appendChild(btnEditar);
-    div.appendChild(btnExcluir);
-
-    lista.appendChild(div);
+    // checkbox
+    const label = document.createElement("label");
+    label.innerHTML = `
+      <input type="checkbox" value="${m.nome}">
+      ${m.nome}
+    `;
+    checkboxDiv.appendChild(label);
+    checkboxDiv.appendChild(document.createElement("br"));
   });
 }
 
-window.editarMinistro = function (id, nome) {
+window.editarMinistro = function (id, nome, telefoneVal) {
   ministro.value = nome;
+  telefone.value = telefoneVal;
   editandoMinistroId = id;
   window.scrollTo(0, 0);
 };
 
 window.excluirMinistro = async function (id) {
-  if (!confirm("Excluir ministro?")) return;
+  if (!confirm("Excluir?")) return;
 
   await deleteDoc(doc(db, "ministros", id));
-
-  alert("Ministro excluído!");
   carregarMinistros();
 };
 
+// =========================
+// ESCALAS
+// =========================
 window.salvarEscala = async function () {
-  const selecionados = [...document.querySelectorAll("#listaMinistros input:checked")]
+
+  const selecionados = [...document.querySelectorAll("#checkboxMinistros input:checked")]
     .map(el => el.value);
 
   if (!data.value || selecionados.length === 0) {
-    alert("Preencha a data e selecione ministros");
+    alert("Preencha tudo");
     return;
   }
 
@@ -106,11 +118,9 @@ window.salvarEscala = async function () {
 
   if (editandoId) {
     await updateDoc(doc(db, "escalas", editandoId), dados);
-    alert("Escala atualizada!");
     editandoId = null;
   } else {
     await addDoc(escalasRef, dados);
-    alert("Escala criada!");
   }
 
   limpar();
@@ -120,12 +130,12 @@ window.salvarEscala = async function () {
 function limpar() {
   data.value = "";
   missa.value = "";
-  document.querySelectorAll("#listaMinistros input").forEach(el => el.checked = false);
+  document.querySelectorAll("#checkboxMinistros input").forEach(el => el.checked = false);
 }
 
 async function carregarEscalas() {
-  const div = document.getElementById("escalas");
-  div.innerHTML = "";
+  const tabela = document.getElementById("escalas");
+  tabela.innerHTML = "";
   escalasCache = {};
 
   const snapshot = await getDocs(escalasRef);
@@ -134,30 +144,23 @@ async function carregarEscalas() {
     const e = docSnap.data();
     escalasCache[docSnap.id] = e;
 
-    const item = document.createElement("div");
+    const tr = document.createElement("tr");
 
-    item.innerHTML = `
-      <b>${e.data} - ${e.missa}</b><br>
-      ${e.ministros.join(", ")}<br><br>
+    tr.innerHTML = `
+      <td>${e.data}</td>
+      <td>${e.missa}</td>
+      <td>${e.ministros.join(", ")}</td>
+      <td>
+        <button class="acao-btn edit" onclick="editarEscala('${docSnap.id}')">✏️</button>
+        <button class="acao-btn delete" onclick="excluirEscala('${docSnap.id}')">🗑️</button>
+      </td>
     `;
 
-    const btnEditar = document.createElement("button");
-    btnEditar.innerText = "✏️ Editar";
-    btnEditar.onclick = () => editar(docSnap.id);
-
-    const btnExcluir = document.createElement("button");
-    btnExcluir.innerText = "🗑️ Excluir";
-    btnExcluir.onclick = () => excluir(docSnap.id);
-
-    item.appendChild(btnEditar);
-    item.appendChild(btnExcluir);
-
-    div.appendChild(item);
-    div.appendChild(document.createElement("hr"));
+    tabela.appendChild(tr);
   });
 }
 
-window.editar = function (id) {
+window.editarEscala = function (id) {
   const e = escalasCache[id];
 
   editandoId = id;
@@ -165,25 +168,23 @@ window.editar = function (id) {
   data.value = e.data;
   missa.value = e.missa;
 
-  document.querySelectorAll("#listaMinistros input").forEach(el => {
+  document.querySelectorAll("#checkboxMinistros input").forEach(el => {
     el.checked = e.ministros.includes(el.value);
   });
 
   window.scrollTo(0, 0);
 };
 
-window.excluir = async function (id) {
+window.excluirEscala = async function (id) {
   if (!confirm("Excluir escala?")) return;
 
   await deleteDoc(doc(db, "escalas", id));
-
-  alert("Escala excluída!");
   carregarEscalas();
 };
 
-carregarMinistros();
-carregarEscalas();
-
+// =========================
+// FORMATAÇÃO HORÁRIO
+// =========================
 function formatarHorario(valor) {
   valor = valor.replace(/[^\d:]/g, "");
 
@@ -196,27 +197,19 @@ function formatarHorario(valor) {
 
   hora = hora.padStart(2, "0");
 
-  if (minuto.length === 1) {
-    minuto = minuto + "0";
-  }
+  if (minuto.length === 1) minuto += "0";
 
   minuto = minuto.padEnd(2, "0");
 
-  let h = parseInt(hora);
-  let m = parseInt(minuto);
+  let h = Math.min(parseInt(hora), 23);
+  let m = Math.min(parseInt(minuto), 59);
 
-  if (h > 23) h = 23;
-  if (m > 59) m = 59;
-
-  hora = h.toString().padStart(2, "0");
-  minuto = m.toString().padStart(2, "0");
-
-  return `${hora}:${minuto}h`;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}h`;
 }
 
-const campoMissa = document.getElementById("missa");
-
-campoMissa.addEventListener("blur", () => {
-  campoMissa.value = formatarHorario(campoMissa.value);
+missa.addEventListener("blur", () => {
+  missa.value = formatarHorario(missa.value);
 });
 
+carregarMinistros();
+carregarEscalas();
