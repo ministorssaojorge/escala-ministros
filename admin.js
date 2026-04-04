@@ -119,7 +119,7 @@ window.salvarEscala = async function () {
 
 function limpar() {
   data.value = "";
-  missa.value = "07h";
+  missa.value = "";
   document.querySelectorAll("#listaMinistros input").forEach(el => el.checked = false);
 }
 
