@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <title>Administrador</title>
 
+<!-- 📅 FULLCALENDAR -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
 <style>
 body {
   font-family: Arial;
@@ -71,6 +75,11 @@ th {
 .edit {
   background: orange;
 }
+
+/* 📅 calendário */
+#calendario {
+  margin-top: 20px;
+}
 </style>
 </head>
 
@@ -107,7 +116,6 @@ th {
 <h3>Nova Escala</h3>
 
 <input type="date" id="data">
-
 <input type="text" id="missa" placeholder="Horário (Ex: 19:30)">
 
 <div id="checkboxMinistros"></div>
@@ -116,7 +124,7 @@ th {
 </div>
 
 <div class="card">
-<h3>Escalas</h3>
+<h3>Escalas (Tabela)</h3>
 
 <table>
 <thead>
@@ -129,7 +137,12 @@ th {
 </thead>
 <tbody id="escalas"></tbody>
 </table>
+</div>
 
+<!-- 📅 NOVO BLOCO -->
+<div class="card">
+<h3>Calendário de Escalas</h3>
+<div id="calendario"></div>
 </div>
 
 <script type="module" src="admin.js"></script>
