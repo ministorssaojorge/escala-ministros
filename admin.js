@@ -103,7 +103,15 @@ function iniciarCalendario() {
   calendar = new FullCalendar.Calendar(el, {
     initialView: 'dayGridMonth',
     locale: 'pt-br',
-    height: 650
+    height: 650,
+
+    eventContent: function(arg) {
+      return {
+        html: `<div style="white-space: normal; word-break: break-word; font-size:12px;">
+          ${arg.event.title}
+        </div>`
+      };
+    }
   });
 
   calendar.render();
