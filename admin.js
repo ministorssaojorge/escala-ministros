@@ -9,6 +9,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 let editandoId = null;
+let editandoMinistroId = null;
 let escalasCache = {};
 
 window.login = async function () {
@@ -23,7 +24,19 @@ const ministrosRef = collection(db, "ministros");
 const escalasRef = collection(db, "escalas");
 
 window.addMinistro = async function () {
-  await addDoc(ministrosRef, { nome: ministro.value });
+  if (!ministro.value) return;
+
+  if (editandoMinistroId) {
+    await updateDoc(doc(db, "ministros", editandoMinistroId), {
+      nome: ministro.value
+    });
+    alert("Ministro atualizado!");
+    editandoMinistroId = null;
+  } else {
+    await addDoc(ministrosRef, { nome: ministro.value });
+    alert("Ministro criado!");
+  }
+
   ministro.value = "";
   carregarMinistros();
 };
@@ -35,14 +48,46 @@ async function carregarMinistros() {
   const snapshot = await getDocs(ministrosRef);
 
   snapshot.forEach(docSnap => {
-    lista.innerHTML += `
+    const nome = docSnap.data().nome;
+
+    const div = document.createElement("div");
+
+    div.innerHTML = `
       <label>
-        <input type="checkbox" value="${docSnap.data().nome}">
-        ${docSnap.data().nome}
-      </label><br>
+        <input type="checkbox" value="${nome}">
+        ${nome}
+      </label>
     `;
+
+    const btnEditar = document.createElement("button");
+    btnEditar.innerText = "✏️";
+    btnEditar.onclick = () => editarMinistro(docSnap.id, nome);
+
+    const btnExcluir = document.createElement("button");
+    btnExcluir.innerText = "🗑️";
+    btnExcluir.onclick = () => excluirMinistro(docSnap.id);
+
+    div.appendChild(btnEditar);
+    div.appendChild(btnExcluir);
+
+    lista.appendChild(div);
   });
 }
+
+window.editarMinistro = function (id, nome) {
+  ministro.value = nome;
+  editandoMinistroId = id;
+  window.scrollTo(0, 0);
+};
+
+window.excluirMinistro = async function (id) {
+  if (!confirm("Excluir ministro?")) return;
+
+  await deleteDoc(doc(db, "ministros", id));
+
+  alert("Ministro excluído!");
+  carregarMinistros();
+};
 
 window.salvarEscala = async function () {
   const selecionados = [...document.querySelectorAll("#listaMinistros input:checked")]
@@ -61,11 +106,11 @@ window.salvarEscala = async function () {
 
   if (editandoId) {
     await updateDoc(doc(db, "escalas", editandoId), dados);
-    alert("Atualizado!");
+    alert("Escala atualizada!");
     editandoId = null;
   } else {
     await addDoc(escalasRef, dados);
-    alert("Criado!");
+    alert("Escala criada!");
   }
 
   limpar();
@@ -115,8 +160,6 @@ async function carregarEscalas() {
 window.editar = function (id) {
   const e = escalasCache[id];
 
-  if (!e) return;
-
   editandoId = id;
 
   data.value = e.data;
@@ -134,7 +177,7 @@ window.excluir = async function (id) {
 
   await deleteDoc(doc(db, "escalas", id));
 
-  alert("Excluído!");
+  alert("Escala excluída!");
   carregarEscalas();
 };
 
