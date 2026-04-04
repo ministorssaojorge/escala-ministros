@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Área do Administrador</h2>
+
+<input id="email" placeholder="Email"><br>
+<input id="senha" type="password" placeholder="Senha"><br>
+
+<button onclick="login()">Entrar</button>
+
+<hr>
+
+<h3>Cadastro de Ministro</h3>
+<input id="ministro" placeholder="Nome">
+<button onclick="addMinistro()">Salvar</button>
+
+<hr>
+
+<h3>Nova Escala</h3>
+<input type="date" id="data">
+<select id="missa">
+  <option>07h</option>
+  <option>09h</option>
+  <option>19h</option>
+</select>
+
+<div id="listaMinistros"></div>
+
+<button onclick="salvarEscala()">Salvar Escala</button>
+
+<hr>
+
+<div id="escalas"></div>
+
+<script type="module" src="admin.js"></script>
+
+</body>
+</html>
