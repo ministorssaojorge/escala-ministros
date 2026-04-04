@@ -100,7 +100,7 @@ window.salvarEscala = async function () {
 
   const dados = {
     data: data.value,
-    missa: missa.value,
+    missa: formatarHorario(missa.value),
     ministros: selecionados
   };
 
@@ -183,3 +183,40 @@ window.excluir = async function (id) {
 
 carregarMinistros();
 carregarEscalas();
+
+function formatarHorario(valor) {
+  valor = valor.replace(/[^\d:]/g, "");
+
+  if (!valor) return "";
+
+  let partes = valor.split(":");
+
+  let hora = partes[0] || "0";
+  let minuto = partes[1] || "0";
+
+  hora = hora.padStart(2, "0");
+
+  if (minuto.length === 1) {
+    minuto = minuto + "0";
+  }
+
+  minuto = minuto.padEnd(2, "0");
+
+  let h = parseInt(hora);
+  let m = parseInt(minuto);
+
+  if (h > 23) h = 23;
+  if (m > 59) m = 59;
+
+  hora = h.toString().padStart(2, "0");
+  minuto = m.toString().padStart(2, "0");
+
+  return `${hora}:${minuto}h`;
+}
+
+const campoMissa = document.getElementById("missa");
+
+campoMissa.addEventListener("blur", () => {
+  campoMissa.value = formatarHorario(campoMissa.value);
+});
+
