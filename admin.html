@@ -7,11 +7,41 @@
 <style>
 body {
   font-family: Arial;
-  background: #ffffff;
+  background: #f4f6f9;
+  margin: 0;
   padding: 20px;
 }
 
-/* estilo planilha */
+h2, h3 {
+  color: #333;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+input, button {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -19,64 +49,73 @@ table {
 }
 
 th, td {
-  border: 1px solid #ccc;
-  padding: 8px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
   text-align: left;
 }
 
 th {
-  background: #f0f0f0;
+  background: #007bff;
+  color: white;
 }
 
-input {
-  padding: 6px;
-  margin: 5px 0;
+.acao-btn {
+  margin-right: 5px;
+  padding: 5px 8px;
 }
 
-button {
-  padding: 6px 12px;
-  margin-top: 5px;
-  cursor: pointer;
+.delete {
+  background: red;
+}
+
+.edit {
+  background: orange;
 }
 </style>
 </head>
 
 <body>
 
+<div class="card">
 <h2>Login</h2>
 <input id="email" placeholder="Email"><br>
 <input id="senha" type="password" placeholder="Senha"><br>
 <button onclick="login()">Entrar</button>
+</div>
 
-<hr>
-
+<div class="card">
 <h3>Cadastro de Ministro</h3>
-<input id="ministro" placeholder="Nome do Ministro">
+
+<input id="ministro" placeholder="Nome">
+<input id="telefone" placeholder="Celular (Ex: 27 99999-9999)">
+
 <button onclick="addMinistro()">Salvar</button>
 
 <table>
 <thead>
 <tr>
 <th>Nome</th>
+<th>Telefone</th>
+<th>Ações</th>
 </tr>
 </thead>
 <tbody id="listaMinistros"></tbody>
 </table>
+</div>
 
-<hr>
-
+<div class="card">
 <h3>Nova Escala</h3>
 
 <input type="date" id="data">
+
 <input type="text" id="missa" placeholder="Horário (Ex: 19:30)">
 
-<h4>Selecionar Ministros</h4>
 <div id="checkboxMinistros"></div>
 
 <button onclick="salvarEscala()">Salvar Escala</button>
+</div>
 
-<hr>
-
+<div class="card">
 <h3>Escalas</h3>
 
 <table>
@@ -85,10 +124,13 @@ button {
 <th>Data</th>
 <th>Horário</th>
 <th>Ministros</th>
+<th>Ações</th>
 </tr>
 </thead>
 <tbody id="escalas"></tbody>
 </table>
+
+</div>
 
 <script type="module" src="admin.js"></script>
 
