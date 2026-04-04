@@ -123,8 +123,9 @@ function iniciarCalendario() {
 window.salvarEscala = async function () {
 
   const selecionados = [...document.querySelectorAll("#checkboxMinistros input:checked")]
-    .map(el => el.value);
-
+  .map(el => el.value)
+  .sort((a, b) => a.localeCompare(b));
+  
   if (!data.value || selecionados.length === 0) {
     alert("Preencha tudo");
     return;
