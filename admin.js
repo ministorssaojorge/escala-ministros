@@ -11,6 +11,7 @@ import {
 let editandoMinistroId = null;
 let editandoId = null;
 let escalasCache = {};
+let calendar;
 
 const ministrosRef = collection(db, "ministros");
 const escalasRef = collection(db, "escalas");
@@ -60,7 +61,6 @@ async function carregarMinistros() {
   snapshot.forEach(docSnap => {
     const m = docSnap.data();
 
-    // tabela
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${m.nome}</td>
@@ -72,7 +72,6 @@ async function carregarMinistros() {
     `;
     lista.appendChild(tr);
 
-    // checkbox
     const label = document.createElement("label");
     label.innerHTML = `
       <input type="checkbox" value="${m.nome}">
@@ -87,15 +86,28 @@ window.editarMinistro = function (id, nome, telefoneVal) {
   ministro.value = nome;
   telefone.value = telefoneVal;
   editandoMinistroId = id;
-  window.scrollTo(0, 0);
 };
 
 window.excluirMinistro = async function (id) {
   if (!confirm("Excluir?")) return;
-
   await deleteDoc(doc(db, "ministros", id));
   carregarMinistros();
 };
+
+// =========================
+// CALENDÁRIO
+// =========================
+function iniciarCalendario() {
+  const el = document.getElementById("calendario");
+
+  calendar = new FullCalendar.Calendar(el, {
+    initialView: 'dayGridMonth',
+    locale: 'pt-br',
+    height: 650
+  });
+
+  calendar.render();
+}
 
 // =========================
 // ESCALAS
@@ -140,14 +152,17 @@ async function carregarEscalas() {
 
   const snapshot = await getDocs(escalasRef);
 
+  if (!calendar) iniciarCalendario();
+  calendar.removeAllEvents();
+
   snapshot.forEach(docSnap => {
     const e = docSnap.data();
     escalasCache[docSnap.id] = e;
 
+    // tabela
     const tr = document.createElement("tr");
-
     tr.innerHTML = `
-      <td>${formatarDataBR(e.data)}
+      <td>${formatarDataBR(e.data)}</td>
       <td>${e.missa}</td>
       <td>${e.ministros.join(", ")}</td>
       <td>
@@ -155,8 +170,13 @@ async function carregarEscalas() {
         <button class="acao-btn delete" onclick="excluirEscala('${docSnap.id}')">🗑️</button>
       </td>
     `;
-
     tabela.appendChild(tr);
+
+    // 📅 calendário
+    calendar.addEvent({
+      title: `${e.missa} - ${e.ministros.join(", ")}`,
+      start: e.data
+    });
   });
 }
 
@@ -164,30 +184,25 @@ window.editarEscala = function (id) {
   const e = escalasCache[id];
 
   editandoId = id;
-
   data.value = e.data;
   missa.value = e.missa;
 
   document.querySelectorAll("#checkboxMinistros input").forEach(el => {
     el.checked = e.ministros.includes(el.value);
   });
-
-  window.scrollTo(0, 0);
 };
 
 window.excluirEscala = async function (id) {
   if (!confirm("Excluir escala?")) return;
-
   await deleteDoc(doc(db, "escalas", id));
   carregarEscalas();
 };
 
 // =========================
-// FORMATAÇÃO HORÁRIO
+// FORMATAÇÕES
 // =========================
 function formatarHorario(valor) {
   valor = valor.replace(/[^\d:]/g, "");
-
   if (!valor) return "";
 
   let partes = valor.split(":");
@@ -196,9 +211,6 @@ function formatarHorario(valor) {
   let minuto = partes[1] || "0";
 
   hora = hora.padStart(2, "0");
-
-  if (minuto.length === 1) minuto += "0";
-
   minuto = minuto.padEnd(2, "0");
 
   let h = Math.min(parseInt(hora), 23);
@@ -207,14 +219,15 @@ function formatarHorario(valor) {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}h`;
 }
 
-missa.addEventListener("blur", () => {
-  missa.value = formatarHorario(missa.value);
-});
-
-carregarMinistros();
-carregarEscalas();
-
 function formatarDataBR(dataISO) {
   const partes = dataISO.split("-");
   return partes[2] + "/" + partes[1] + "/" + partes[0];
 }
+
+missa.addEventListener("blur", () => {
+  missa.value = formatarHorario(missa.value);
+});
+
+// iniciar
+carregarMinistros();
+carregarEscalas();
