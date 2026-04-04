@@ -3,15 +3,16 @@ body {
   padding: 20px;
 }
 
-/* 👇 QUEBRA AUTOMÁTICA NO CALENDÁRIO */
-.fc-event-title {
+/* calendário */
+.fc .fc-event-title,
+.fc .fc-event-main {
   white-space: normal !important;
-  word-wrap: break-word;
+  word-break: break-word;
   overflow-wrap: break-word;
+  line-height: 1.2;
   font-size: 12px;
 }
 
-/* 👇 DEIXA MAIS COMPACTO */
-.fc-event {
-  padding: 2px;
+.fc-daygrid-event {
+  white-space: normal !important;
 }
