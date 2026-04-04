@@ -5,10 +5,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
-  collection, addDoc, getDocs, doc, updateDoc
+  collection, addDoc, getDocs, doc, updateDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 let editandoId = null;
+let escalasCache = {}; // guardar dados para evitar erro no botão
 
 window.login = async function () {
   await signInWithEmailAndPassword(auth, email.value, senha.value);
@@ -26,6 +27,7 @@ window.addMinistro = async function () {
     nome: ministro.value
   });
 
+  ministro.value = "";
   carregarMinistros();
 };
 
@@ -54,10 +56,15 @@ window.salvarEscala = async function () {
     ministros: selecionados
   };
 
+  if (!dados.data || selecionados.length === 0) {
+    alert("Preencha a data e selecione ministros");
+    return;
+  }
+
   if (editandoId) {
     await updateDoc(doc(db, "escalas", editandoId), dados);
-    editandoId = null;
     alert("Escala atualizada!");
+    editandoId = null;
   } else {
     await addDoc(escalasRef, dados);
     alert("Escala criada!");
@@ -75,35 +82,56 @@ function limparFormulario() {
 
 async function carregarEscalas() {
   escalas.innerHTML = "";
+  escalasCache = {};
 
   const snapshot = await getDocs(escalasRef);
 
   snapshot.forEach(docSnap => {
     const e = docSnap.data();
+    escalasCache[docSnap.id] = e;
 
     escalas.innerHTML += `
       <div>
         <b>${e.data} - ${e.missa}</b><br>
         ${e.ministros.join(", ")}<br><br>
 
-        <button onclick="editar('${docSnap.id}', '${e.data}', '${e.missa}', ${JSON.stringify(e.ministros)})">
-          ✏️ Editar
-        </button>
+        <button onclick="editar('${docSnap.id}')">✏️ Editar</button>
+        <button onclick="excluir('${docSnap.id}')">🗑️ Excluir</button>
 
       </div><hr>
     `;
   });
 }
 
-window.editar = function (id, dataVal, missaVal, ministrosVal) {
+window.editar = function (id) {
+  const e = escalasCache[id];
+
+  if (!e) {
+    alert("Erro ao carregar dados");
+    return;
+  }
+
   editandoId = id;
 
-  data.value = dataVal;
-  missa.value = missaVal;
+  data.value = e.data;
+  missa.value = e.missa;
 
   document.querySelectorAll("#listaMinistros input").forEach(el => {
-    el.checked = ministrosVal.includes(el.value);
+    el.checked = e.ministros.includes(el.value);
   });
 
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
+
+window.excluir = async function (id) {
+  if (!confirm("Deseja excluir esta escala?")) return;
+
+  await deleteDoc(doc(db, "escalas", id));
+
+  alert("Escala excluída!");
+  carregarEscalas();
+};
+
+// inicialização (opcional se quiser carregar direto)
+carregarMinistros();
+carregarEscalas();
