@@ -18,19 +18,23 @@
 <hr>
 
 <h3>Nova Escala</h3>
+
 <input type="date" id="data">
+
 <select id="missa">
-  <option>07h</option>
-  <option>09h</option>
-  <option>19h</option>
+  <option value="07h">07h</option>
+  <option value="09h">09h</option>
+  <option value="19h">19h</option>
 </select>
 
+<!-- ⚠️ ESSE ID É O MAIS IMPORTANTE -->
 <div id="listaMinistros"></div>
 
 <button onclick="salvarEscala()">Salvar Escala</button>
 
 <hr>
 
+<!-- ⚠️ ESSE TAMBÉM -->
 <div id="escalas"></div>
 
 <script type="module" src="admin.js"></script>
