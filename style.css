@@ -2,6 +2,8 @@ body {
   font-family: Arial;
   padding: 20px;
 }
+
+/* 👇 QUEBRA AUTOMÁTICA NO CALENDÁRIO */
 .fc-event-title {
   white-space: normal !important;
   word-wrap: break-word;
@@ -9,6 +11,7 @@ body {
   font-size: 12px;
 }
 
+/* 👇 DEIXA MAIS COMPACTO */
 .fc-event {
   padding: 2px;
 }
