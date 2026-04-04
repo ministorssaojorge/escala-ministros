@@ -172,10 +172,10 @@ async function carregarEscalas() {
     `;
     tabela.appendChild(tr);
 
-    // 📅 calendário
+    // 📅 calendário (CORRIGIDO)
     calendar.addEvent({
-      title: `${e.missa} - ${e.ministros.join(", ")}`,
-      start: e.data
+      title: `${e.missa} - ${e.ministros.join(", ")} `,
+      start: e.data + "T00:00:00"
     });
   });
 }
