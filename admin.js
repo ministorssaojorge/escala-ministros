@@ -107,10 +107,18 @@ function iniciarCalendario() {
 
     eventContent: function(arg) {
       return {
-        html: `<div style="white-space: normal; word-break: break-word; font-size:12px;">
+        html: `<div style="white-space: normal; font-size:12px;">
           ${arg.event.title}
         </div>`
       };
+    },
+
+    eventClick: function(info) {
+      alert(
+        "📅 Data: " + formatarDataBR(info.event.startStr.split("T")[0]) + "\n\n" +
+        "⏰ Missa: " + info.event.extendedProps.missa + "\n\n" +
+        "👥 Ministros:\n" + info.event.extendedProps.ministros.join("\n")
+      );
     }
   });
 
