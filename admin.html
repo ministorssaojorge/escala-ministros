@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Administrador</title>
+
+<!-- 📅 FULLCALENDAR -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f4f6f9;
+  margin: 0;
+  padding: 20px;
+}
+
+h2, h3 {
+  color: #333;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+input, button {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background: #007bff;
+  color: white;
+}
+
+.acao-btn {
+  margin-right: 5px;
+  padding: 5px 8px;
+}
+
+.delete {
+  background: red;
+}
+
+.edit {
+  background: orange;
+}
+
+/* 📅 calendário */
+#calendario {
+  margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h2>Login</h2>
+<input id="email" placeholder="Email"><br>
+<input id="senha" type="password" placeholder="Senha"><br>
+<button onclick="login()">Entrar</button>
+</div>
+
+<div class="card">
+<h3>Cadastro de Ministro</h3>
+
+<input id="ministro" placeholder="Nome">
+<input id="telefone" placeholder="Celular (Ex: 27 99999-9999)">
+
+<button onclick="addMinistro()">Salvar</button>
+
+<table>
+<thead>
+<tr>
+<th>Nome</th>
+<th>Telefone</th>
+<th>Ações</th>
+</tr>
+</thead>
+<tbody id="listaMinistros"></tbody>
+</table>
+</div>
+
+<div class="card">
+<h3>Nova Escala</h3>
+
+<input type="date" id="data">
+<input type="text" id="missa" placeholder="Horário (Ex: 19:30)">
+
+<div id="checkboxMinistros"></div>
+
+<button onclick="salvarEscala()">Salvar Escala</button>
+</div>
+
+<div class="card">
+<h3>Escalas (Tabela)</h3>
+
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Horário</th>
+<th>Ministros</th>
+<th>Ações</th>
+</tr>
+</thead>
+<tbody id="escalas"></tbody>
+</table>
+</div>
+
+<!-- 📅 NOVO BLOCO -->
+<div class="card">
+<h3>Calendário de Escalas</h3>
+<div id="calendario"></div>
+</div>
+
+<script type="module" src="admin.js"></script>
+
+</body>
+</html>
