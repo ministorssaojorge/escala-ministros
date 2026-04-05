@@ -190,10 +190,21 @@ async function carregarEscalas() {
     tabela.appendChild(tr);
 
     // 📅 calendário (CORRIGIDO)
-    calendar.addEvent({
-      title: `${e.missa} - ${e.ministros.join(", ")} `,
-      start: e.data + "T00:00:00"
-    });
+    let cor = "#3788d8"; // padrão
+
+if (e.missa.includes("07")) cor = "#2196F3";      // azul
+if (e.missa.includes("19")) cor = "#4CAF50";      // verde
+
+calendar.addEvent({
+  title: `${e.missa} - ${e.ministros.join(", ")}`,
+  start: e.data + "T00:00:00",
+  backgroundColor: cor,
+  borderColor: cor,
+  extendedProps: {
+    missa: e.missa,
+    ministros: e.ministros
+  }
+});
   });
 }
 
